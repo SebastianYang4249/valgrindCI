@@ -44,4 +44,6 @@ int main(int argc, char *argv[]) {
   for (const auto &s : res) {
     std::cout << s << std::endl;
   }
+
+  ls.getMermaid();
 }

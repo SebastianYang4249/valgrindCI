@@ -27,8 +27,10 @@ void ListStorage::CreateNewList(const std::vector<std::string> &list) {
   for (const std::string &s : list) {
     l->PushBack(s);
   }
-  for ( int i = 0; i< list.size() - 2; ++i){
-    mmap[list[i]].push_back(list[i+1]);
+  for (int i = 0; i < list.size() - 2; ++i) {
+    if (find(mmap[list[i]].begin(), mmap[list[i]].end(), list[i + 1]) !=
+        mmap[list[i]].end())
+      mmap[list[i]].push_back(list[i + 1]);
   }
 
   if (this->ListSet.find(l->GetList()) == this->ListSet.end()) {
