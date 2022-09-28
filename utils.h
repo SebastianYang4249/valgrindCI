@@ -21,9 +21,15 @@
 #include <fstream>
 #include <stack>
 
-std::pair<std::string, std::string> StrSplit(std::string str, const char ch = ' ');
-bool IsBackend(std::string file, std::string backend);
-int FindNum(std::string s, char ch);
-std::vector<std::string> StrToVec(std::string s , char divide);
+enum SpiltMode{
+  BEGIN,
+  END
+};
+
+std::pair<std::string, std::string> StrSplit(const std::string& str, char ch = ' ', SpiltMode mode = BEGIN);
+bool IsBackend(const std::string& file, const std::string& backend);
+int FindNum(const std::string& s, char ch);
+int FindNum(const std::string& s, const std::string& k);
+std::vector<std::string> StrToVec(const std::string& s , char divide);
 
 #endif // VALGRIND_MEM_UTILS_H

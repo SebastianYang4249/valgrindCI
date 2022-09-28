@@ -27,13 +27,7 @@ public:
   void CreateNewList(const std::vector<std::string> &list);
   std::vector<std::string> GetAllLists();
   std::vector<std::vector<std::string>> GetAllVecs();
-  void getMermaid(){
-    for ( const auto& it : mmap){
-      for ( const auto& value : it.second){
-        std::cout << it.first << " --> " << value << std::endl;
-      }
-    }
-  }
+  std::vector<std::string> getMermaid();
 
 private:
   std::unordered_set<std::string> ListSet;

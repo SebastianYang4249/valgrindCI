@@ -8,7 +8,7 @@ void ReadReport(ListStorage &ls, std::string reportFile,
                 std::unordered_map<std::string, std::string> files) {
   std::ifstream fin(reportFile);
 
-  ASSERT(fin.good(), "open reportfile " + reportFile + "failed");
+  ASSERT(fin.good(), "open report file " + reportFile + " failed");
 
   std::string buffer;
   while (getline(fin, buffer)) {
@@ -17,7 +17,9 @@ void ReadReport(ListStorage &ls, std::string reportFile,
       getline(fin, buffer);
       while (buffer.find(":") != std::string::npos) {
         std::string func = StrSplit(buffer, ':').second;
-        list.push_back(StrSplit(func, '(').first);
+        std::string fileName = StrSplit(StrSplit(func, '(', END).second, ':').first;
+        if (files.find(fileName) != files.end())
+          list.push_back(StrSplit(func, '(', BEGIN).first);
         getline(fin, buffer);
       }
       ls.CreateNewList(list);
