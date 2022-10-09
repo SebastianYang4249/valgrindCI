@@ -22,7 +22,8 @@ int List::ListLen() {
   return res < 0 ? 0 : res;
 }
 
-void ListStorage::CreateNewList(const std::vector<std::string> &list) {
+void ListStorage::CreateNewList(const std::vector<std::string> &list,
+                                LeakType t) {
   if (!list.size())
     return;
   List *l = new List;
@@ -30,12 +31,17 @@ void ListStorage::CreateNewList(const std::vector<std::string> &list) {
     l->PushBack(s);
   }
 
-  if (list.size() >= 2)
+  if (list.size() >= 2) {
     for (int i = 0; i < list.size() - 2; ++i) {
-      if (find(mmap[list[i]].begin(), mmap[list[i]].end(), list[i + 1]) ==
-          mmap[list[i]].end())
-        mmap[list[i]].push_back(list[i + 1]);
+      if (find(this->LeakMap[list[i]].begin(), this->LeakMap[list[i]].end(),
+               list[i + 1]) == this->LeakMap[list[i]].end())
+        this->LeakMap[list[i]].push_back(list[i + 1]);
     }
+  }
+
+  for (const std::string &s : list) {
+    this->TypeMap[s] = t;
+  }
 
   if (this->ListSet.find(l->GetList()) == this->ListSet.end()) {
     this->ListSet.insert(l->GetList());
@@ -50,17 +56,30 @@ std::vector<std::string> ListStorage::GetAllLists() {
   return res;
 }
 
-std::vector<std::string> ListStorage::getMermaid() {
-  std::vector<std::string> res;
-  for (const auto &it : this->mmap) {
+void ListStorage::getMermaid() {
+  std::cout << "graph LR" << std::endl;
+  for (const auto &it : this->LeakMap) {
     if (FindNum(it.first, '<') > 0 || FindNum(it.first, '?') > 0 ||
-        FindNum(it.first, '@') > 0 || FindNum(it.first, "operator") != -1)
+        FindNum(it.first, '.') > 0 || FindNum(it.first, '@') > 0 ||
+        FindNum(it.first, "operator") != -1)
       continue;
     for (const auto &value : it.second) {
       if (FindNum(value, '<') == 0 && FindNum(value, '?') == 0 &&
-          FindNum(value, '@') == 0 && FindNum(it.first, "operator") == -1)
+          FindNum(it.first, '.') == 0 && FindNum(value, '@') == 0 &&
+          FindNum(it.first, "operator") == -1)
         std::cout << it.first << " --> " << value << std::endl;
     }
+  }
+
+  std::vector<std::string> TypeColor = {"#C848B9", "#F962A7", "#FD836D",
+                                        "#FFBA69"};
+  for (const auto p : this->TypeMap) {
+    if (FindNum(p.first, '<') > 0 || FindNum(p.first, '?') > 0 ||
+        FindNum(p.first, '.') > 0 || FindNum(p.first, '@') > 0 ||
+        FindNum(p.first, "operator") != -1)
+      continue;
+    std::cout << " style" << p.first << " fill:" << TypeColor[p.second] << ";"
+              << std::endl;
   }
 }
 

@@ -9,6 +9,13 @@
 
 #include "utils.h"
 
+enum LeakType {
+  DefinitelyLost,
+  IndirectlyLost,
+  PossiblyLost,
+  StillReachable,
+};
+
 class List {
 public:
   ~List();
@@ -24,14 +31,15 @@ private:
 
 class ListStorage {
 public:
-  void CreateNewList(const std::vector<std::string> &list);
+  void CreateNewList(const std::vector<std::string> &list, LeakType t);
   std::vector<std::string> GetAllLists();
   std::vector<std::vector<std::string>> GetAllVecs();
-  std::vector<std::string> getMermaid();
+  void getMermaid();
 
 private:
   std::unordered_set<std::string> ListSet;
-  std::unordered_map<std::string,std::vector<std::string>> mmap;
+  std::unordered_map<std::string, std::vector<std::string>> LeakMap;
+  std::unordered_map<std::string, LeakType> TypeMap;
 };
 
 class Tree {
@@ -41,7 +49,7 @@ public:
 
 private:
   std::string value;
-  std::unordered_map<std::string,Tree*> childs;
+  std::unordered_map<std::string, Tree *> childs;
 };
 
 #endif // VALGRIND_MEM_LIST_H
