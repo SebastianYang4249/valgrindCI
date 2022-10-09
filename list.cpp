@@ -65,8 +65,8 @@ void ListStorage::getMermaid() {
       continue;
     for (const auto &value : it.second) {
       if (FindNum(value, '<') == 0 && FindNum(value, '?') == 0 &&
-          FindNum(it.first, '.') == 0 && FindNum(value, '@') == 0 &&
-          FindNum(it.first, "operator") == -1)
+          FindNum(value, '.') == 0 && FindNum(value, '@') == 0 &&
+          FindNum(value, "operator") == -1)
         std::cout << it.first << " --> " << value << std::endl;
     }
   }
