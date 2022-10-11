@@ -41,10 +41,8 @@ void FileTreeDfs(std::string dir,
   }
 }
 
-std::unordered_map<std::string, std::string> FileTree(std::string dir) {
+std::unordered_map<std::string, std::string> FileTree(std::string dir, std::unordered_set<std::string> ignores, std::vector<std::string> masks) {
   std::unordered_map<std::string, std::string> files;
-  std::unordered_set<std::string> ignores = {".", "..", ".git"};
-  std::vector<std::string> masks = {".c", ".cpp", ".h", ".hpp"};
   FileTreeDfs(dir, files, ignores, masks);
   return files;
 }

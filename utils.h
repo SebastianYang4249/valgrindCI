@@ -31,5 +31,6 @@ bool IsBackend(const std::string& file, const std::string& backend);
 int FindNum(const std::string& s, char ch);
 int FindNum(const std::string& s, const std::string& k);
 std::vector<std::string> StrToVec(const std::string& s , char divide);
+std::string RemoveSpace(std::string s);
 
 #endif // VALGRIND_MEM_UTILS_H
