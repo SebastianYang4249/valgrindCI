@@ -13,9 +13,14 @@ enum LeakType {
   DefinitelyLost,
   IndirectlyLost,
   PossiblyLost,
-  StillReachable,
-  InvalidRead,
-  InvalidWrite
+  StillReachable
+};
+
+enum Colors {
+  sunset,
+  posicle,
+  cranberry,
+  warming
 };
 
 class List {
@@ -47,7 +52,7 @@ public:
   std::vector<std::vector<std::string>> GetAllVecs();
   // get all list in ListSet and get a vector type
 
-  void getMermaid();
+  void getMermaid(Colors c);
   // get mermaid file output
 
 private:

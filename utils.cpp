@@ -16,6 +16,19 @@ std::pair<std::string, std::string> StrSplit(const std::string &str, char ch,
   return {s1, s2};
 }
 
+std::pair<std::string, std::string>
+StrSplit(const std::string &str, const std::string &k, SpiltMode mode) {
+  int pivot;
+  int l = k.length();
+  if (mode == BEGIN)
+    pivot = str.find(k);
+  else
+    pivot = str.rfind(k);
+  std::string s1 = str.substr(0, pivot);
+  std::string s2 = str.substr(pivot + l + 1, str.size() - 1);
+  return {s1, s2};
+}
+
 bool IsBackend(const std::string &file, const std::string &backend) {
   if (file.find('.') == std::string::npos)
     return false;
@@ -61,4 +74,15 @@ std::string RemoveSpace(std::string s) {
     }
     return s.substr(left, right);
   }
+}
+
+std::string RemoveCharInString(std::string &s, const char &ch) {
+  std::string::iterator it = s.begin();
+  for (; it != s.end();) {
+    if (*it == ch)
+      it = s.erase(it);
+    else
+      it++;
+  }
+  return s;
 }

@@ -12,6 +12,6 @@
 #define ASSERT(expr, log) do { if(!!(expr)) ; else std::cerr << log << std::endl; } while(0)
 
 void FileTreeDfs(std::string dir, std::unordered_map<std::string, std::string>& files, std::unordered_set<std::string> ignoreFiles, std::vector<std::string> mask);
-std::unordered_map<std::string, std::string> FileTree(std::string dir, std::unordered_set<std::string> ignores = {".", "..", ".git"}, std::vector<std::string> masks = {".c", ".cpp", ".h", ".hpp"});
+void FileTree(std::unordered_map<std::string, std::string> &files, std::string dir, std::unordered_set<std::string> ignores, std::vector<std::string> masks);
 
 #endif // VALGRIND_MEM_FILE_H

@@ -4,6 +4,13 @@
 
 #include "list.h"
 
+std::vector<std::vector<std::string>> colors = {
+    {"#C848B9", "#F962A7", "#FD836D", "#FFBA69"},
+    {"#F3533A", "#FA9F42", "#8AD879", "#5ACFC9"},
+    {"#DD4470", "#FE72A9", "#FFC872", "#FCE4BF"},
+    {"#C5211C", "#E4443F", "#F59B65", "#F7BA79"},
+};
+
 List::~List() {}
 
 void List::PushBack(std::string s) {
@@ -71,7 +78,7 @@ std::vector<std::string> ListStorage::GetAllLists() {
   return res;
 }
 
-void ListStorage::getMermaid() {
+void ListStorage::getMermaid(Colors c) {
   std::cout << "graph LR" << std::endl;
   for (const auto &it : this->LeakMap) {
     if (FindNum(it.first, '<') > 0 || FindNum(it.first, '?') > 0 ||
@@ -100,10 +107,10 @@ void ListStorage::getMermaid() {
   }
 
   std::cout << std::endl;
-  std::cout << "    classDef DefinitelyLost fill:#C5211C" << std::endl;
-  std::cout << "    classDef IndirectlyLost fill:#E4443F" << std::endl;
-  std::cout << "    classDef PossiblyLost fill:#F59B65" << std::endl;
-  std::cout << "    classDef StillReachable fill:#F7BA79" << std::endl;
+  std::cout << "    classDef DefinitelyLost fill:" << colors[c][0] << std::endl;
+  std::cout << "    classDef IndirectlyLost fill:" << colors[c][1] << std::endl;
+  std::cout << "    classDef PossiblyLost fill:"   << colors[c][2] << std::endl;
+  std::cout << "    classDef StillReachable fill:" << colors[c][3] << std::endl;
   std::cout << std::endl;
 
   std::vector<std::string> Type = {"DefinitelyLost", "IndirectlyLost",

@@ -21,18 +21,37 @@ void ReadReport(ListStorage &ls, std::string reportFile,
     for (const auto p : typeMap) {
       if (buffer.find(p.first) != std::string::npos) {
         std::vector<std::string> list;
-        int leakSize = stoi(RemoveSpace(
-            StrSplit(StrSplit(buffer, '=', END).second, 'b', BEGIN).first));
+        std::string leakSizeRaw = RemoveSpace(
+            StrSplit(StrSplit(buffer, '=', END).second, 'b', BEGIN).first);
+        int leakSize;
+        if (FindNum(leakSizeRaw, ',') > 0) {
+          leakSize = stoi(RemoveCharInString(leakSizeRaw, ','));
+        } else {
+          leakSize = stoi(leakSizeRaw);
+        }
         getline(fin, buffer);
         while (buffer.find(":") != std::string::npos) {
           std::string Str = StrSplit(buffer, ':').second;
           std::string fileName =
               StrSplit(StrSplit(Str, '(', END).second, ':').first;
+          if (FindNum(fileName, '/') != 0) {
+            fileName = StrSplit(fileName, '/', END).second;
+          }
           if (files.find(fileName) != files.end()) {
             std::string funcName = RemoveSpace(StrSplit(Str, '(', BEGIN).first);
             list.push_back(funcName);
-            ls.CreateNewLeakPos(
-                funcName, StrSplit(StrSplit(Str, '(', END).second, ')').first);
+            std::string filePos =
+                StrSplit(StrSplit(Str, '(', END).second, ')').first;
+            if (FindNum(filePos, '/')) {
+              ls.CreateNewLeakPos(
+                  funcName,
+                  StrSplit(StrSplit(Str, '(', END).second, ')').first);
+            } else {
+              ls.CreateNewLeakPos(
+                  funcName,
+                  "/src/" + StrSplit(files[fileName], "src").second + ":" +
+                      StrSplit(StrSplit(filePos, ':').second, ')').first);
+            }
             ls.SetSize(funcName, leakSize);
           }
           getline(fin, buffer);
@@ -43,19 +62,58 @@ void ReadReport(ListStorage &ls, std::string reportFile,
   }
 }
 
+std::unordered_map<std::string, std::vector<std::string>>
+GetArgs(int argc, char *argv[]) {
+  std::unordered_map<std::string, std::vector<std::string>> args;
+  for (int i = 1; i < argc; ++i) {
+    std::string option = StrSplit(std::string(argv[i]), '=').first;
+    std::string value = StrSplit(std::string(argv[i]), '=').second;
+    args[option].push_back(value);
+  }
+  return args;
+}
+
 int main(int argc, char *argv[]) {
-  ASSERT(argc >= 2, "At least two parameters needed : source code directory, "
-                    "new memcheck report directory, old report directory");
+  if (argc == 1 && argv[1] == "help") {
+    std::cout
+        << "    -c=xxx to add your source code directory    [at least one]"
+        << std::endl;
+    std::cout
+        << "    -o=xxx to add your old reports directory    [at least one]"
+        << std::endl;
+    std::cout
+        << "    -n=xxx to add your new reports directory    [at least one]"
+        << std::endl;
+    std::cout
+        << "    -f=xxx to custom your own svg colors        [not necessary]"
+        << std::endl;
+    std::cout << "        choice : sunset / posicle / cranberry / warming"
+              << std::endl;
+  }
 
-  std::unordered_map<std::string, std::string> files = FileTree(argv[1]);
+  std::unordered_map<std::string, std::vector<std::string>> args =
+      GetArgs(argc, argv);
+  ASSERT(args.size() >= 2,
+         "At least two parameters needed : source code directory, "
+         "new memcheck report directory, old report directory");
 
-  std::unordered_map<std::string, std::string> reportFiles =
-      FileTree(argv[2], {".", ".."}, {".log"});
+  std::unordered_map<std::string, std::string> files;
+  for (const std::string &s : args["-c"]) {
+    FileTree(files, s, {".", "..", ".git"},
+             {".c", ".cc", ".h", ".cpp", ".hpp"});
+  }
+  ASSERT(files.size() > 0, "source code directory has no files in it");
+
+  std::unordered_map<std::string, std::string> reportFiles;
+  for (const std::string &s : args["-o"]) {
+    FileTree(reportFiles, s, {".", "..", ".git"}, {".log"});
+  }
+  ASSERT(reportFiles.size() > 0, "reports directory has no files in it");
+
   ListStorage ls;
   ListStorage OldLS;
 
   for (const auto &p : reportFiles) {
-    std::cout << "Reading file : " << p.second << std::endl;
     ReadReport(ls, p.second, files);
   }
 
@@ -70,5 +128,10 @@ int main(int argc, char *argv[]) {
 
    */
 
-  ls.getMermaid();
+  std::unordered_map<std::string, Colors> cPairs = {{"sunset", sunset},
+                                                    {"posicle", posicle},
+                                                    {"cranberry", cranberry},
+                                                    {"warming", warming}};
+  Colors c = (args.find("-f") == args.end()) ? warming : cPairs[args["-f"][0]];
+  ls.getMermaid(c);
 }
